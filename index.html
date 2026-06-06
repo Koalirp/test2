@@ -337,9 +337,9 @@
 
     <div class="card anim-in-delay">
       <div class="field">
-        <label>IP de la computadora</label>
-        <input id="inp-ip" type="text" inputmode="decimal"
-               placeholder="192.168.1.X" autocomplete="off" spellcheck="false" />
+        <label>IP o dirección (host:puerto)</label>
+        <input id="inp-ip" type="text" inputmode="url"
+               placeholder="192.168.1.X  ó  0.tcp.ngrok.io:12345" autocomplete="off" spellcheck="false" />
       </div>
       <div class="field">
         <label>Código de acceso</label>
@@ -425,7 +425,12 @@
 
     /* ── WebSocket ─────────────────────────────────────── */
     function connectWS(ip, code) {
-      const url = `ws://${ip}:8765`;
+      // Si ya trae puerto (host:puerto) úsalo directo, si no agrega :8765
+      const hasPort = /:\d+$/.test(ip);
+      const hostPort = hasPort ? ip : `${ip}:8765`;
+      // wss si la página es https (GitHub Pages), ws si es local
+      const protocol = location.protocol === 'https:' ? 'wss' : 'ws';
+      const url = `${protocol}://${hostPort}`;
       try { ws = new WebSocket(url); }
       catch(e) { showError('No se pudo crear conexión WebSocket.'); return; }
 
